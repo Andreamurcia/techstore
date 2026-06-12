@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechStore</title>
+<link rel="stylesheet" href="estilos.css">
+
+<style>
+.carrito {
+    position: fixed;
+    right: 10px;
+    top: 120px;
+    width: 220px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    padding: 10px;
+    font-size: 14px;
+    z-index: 999;
+}
+
+table {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #ccc;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+button {
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>TechStore</h1>
+    <p>Tu tienda de computadoras y accesorios tecnológicos</p>
+</header>
+
+<nav>
+    <a href="#inicio">Inicio</a>
+    <a href="#productos">Productos</a>
+    <a href="#registro">Registro</a>
+    <a href="#contacto">Contacto</a>
+</nav>
+
+<section class="banner" id="inicio">
+    <h2>Bienvenido a TechStore</h2>
+    <p>Encuentra las mejores computadoras, accesorios y equipos tecnológicos.</p>
+</section>
+
+<main>
+
+<section id="productos">
+    <h2>Productos Destacados</h2>
+
+    <div class="producto">
+        <img src="imagenes/laptop.jpg">
+        <h3>Laptop Gamer</h3>
+        <p>Intel Core i7, 16GB RAM, SSD 512GB.</p>
+        <p><strong>$1200</strong></p>
+        <button onclick="agregar('Laptop Gamer',1200)">Comprar</button>
+    </div>
+
+    <div class="producto">
+        <img src="imagenes/teclado gamer.jpeg">
+        <h3>Teclado Mecánico RGB</h3>
+        <p>Iluminación RGB y switches mecánicos.</p>
+        <p><strong>$80</strong></p>
+        <button onclick="agregar('Teclado RGB',80)">Comprar</button>
+    </div>
+
+    <div class="producto">
+        <img src="imagenes/mousegamer.jpeg">
+        <h3>Mouse Gamer</h3>
+        <p>Alta precisión para juegos y trabajo.</p>
+        <p><strong>$35</strong></p>
+        <button onclick="agregar('Mouse Gamer',35)">Comprar</button>
+    </div>
+
+    <div class="producto">
+        <img src="imagenes/monitor.jpg">
+        <h3>Monitor 24 Pulgadas</h3>
+        <p>Pantalla Full HD ideal para trabajo y juegos.</p>
+        <p><strong>$180</strong></p>
+        <button onclick="agregar('Monitor',180)">Comprar</button>
+    </div>
+
+    <div class="producto">
+        <img src="imagenes/audifono gamer.jpeg">
+        <h3>Audífonos Gamer</h3>
+        <p>Sonido envolvente 7.1 y micrófono integrado.</p>
+        <p><strong>$60</strong></p>
+        <button onclick="agregar('Audífonos',60)">Comprar</button>
+    </div>
+
+</section>
+
+<!-- 🧾 REGISTRO -->
+<section id="registro">
+    <h2>Registro de Clientes</h2>
+
+    <input type="text" id="nombre" placeholder="Nombre completo">
+    <input type="email" id="correo" placeholder="Correo electrónico">
+    <input type="tel" id="telefono" placeholder="Teléfono">
+    <input type="password" id="password" placeholder="Contraseña">
+
+    <button onclick="registrar()">Registrar</button>
+    <button onclick="verUsuarios()">Ver clientes registrados</button>
+
+    <p id="mensaje"></p>
+
+    <div id="tablaUsuarios"></div>
+</section>
+
+<!-- 📞 CONTACTO -->
+<section id="contacto">
+    <h2>Contacto</h2>
+    <p>📧 info@techstore.com</p>
+    <p>📞 2222-2222</p>
+    <p>📍 San Salvador, El Salvador</p>
+</section>
+
+</main>
+
+<!-- 🛒 CARRITO -->
+<div class="carrito">
+    <h2>🛒 Carrito</h2>
+
+    <div id="lista"></div>
+
+    <h3>Total: $<span id="total">0</span></h3>
+
+    <button onclick="pagar()">💳 Pagar</button>
+</div>
+
+<script>
+let carrito = [];
+let total = 0;
+
+/* 🛒 CARRITO */
+function agregar(nombre, precio) {
+    carrito.push({nombre, precio});
+    total += precio;
+    mostrar();
+}
+
+function eliminar(index) {
+    total -= carrito[index].precio;
+    carrito.splice(index, 1);
+    mostrar();
+}
+
+function mostrar() {
+    let lista = document.getElementById("lista");
+    lista.innerHTML = "";
+
+    carrito.forEach((item, index) => {
+        lista.innerHTML += `
+        <div>
+            ${item.nombre} - $${item.precio}
+            <button onclick="eliminar(${index})">x</button>
+        </div>
+        `;
+    });
+
+    document.getElementById("total").innerText = total;
+}
+
+function pagar() {
+    if (carrito.length === 0) {
+        alert("El carrito está vacío");
+        return;
+    }
+
+    alert("Pago realizado con éxito. Total: $" + total);
+
+    carrito = [];
+    total = 0;
+    mostrar();
+}
+
+/* 🧾 REGISTRO */
+function registrar() {
+    let nombre = document.getElementById("nombre").value;
+    let correo = document.getElementById("correo").value;
+    let telefono = document.getElementById("telefono").value;
+    let password = document.getElementById("password").value;
+
+    if(nombre === "" || correo === "" || telefono === "" || password === "") {
+        document.getElementById("mensaje").innerText =
+            "Completa todos los campos ❌";
+        return;
+    }
+
+    let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+
+    usuarios.push({ nombre, correo, telefono });
+
+    localStorage.setItem("usuarios", JSON.stringify(usuarios));
+
+    document.getElementById("mensaje").innerText =
+        "Guardado correctamente ✔️";
+
+    // 🔥 LIMPIAR CAMPOS (TODOS)
+    document.getElementById("nombre").value = "";
+    document.getElementById("correo").value = "";
+    document.getElementById("telefono").value = "";
+    document.getElementById("password").value = "";
+}
+
+/* 👀 VER + EDITAR + ELIMINAR */
+function verUsuarios() {
+    let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+
+    let contenedor = document.getElementById("tablaUsuarios");
+    contenedor.innerHTML = "";
+
+    if (usuarios.length === 0) {
+        contenedor.innerHTML = "<p>No hay clientes registrados</p>";
+        return;
+    }
+
+    let tabla = "<h3>Clientes registrados</h3>";
+    tabla += "<table>";
+    tabla += "<tr><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Acciones</th></tr>";
+
+    usuarios.forEach((u,i) => {
+        tabla += `
+        <tr>
+            <td>${u.nombre}</td>
+            <td>${u.correo}</td>
+            <td>${u.telefono}</td>
+            <td>
+                <button onclick="editar(${i})">✏️</button>
+                <button onclick="eliminarUsuario(${i})">🗑️</button>
+            </td>
+        </tr>`;
+    });
+
+    tabla += "</table>";
+
+    contenedor.innerHTML = tabla;
+}
+
+/* 🗑️ ELIMINAR */
+function eliminarUsuario(i){
+    let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+    usuarios.splice(i,1);
+    localStorage.setItem("usuarios", JSON.stringify(usuarios));
+    verUsuarios();
+}
+
+/* ✏️ EDITAR */
+function editar(i){
+    let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+
+    let nombre = prompt("Nuevo nombre", usuarios[i].nombre);
+    let correo = prompt("Nuevo correo", usuarios[i].correo);
+    let telefono = prompt("Nuevo teléfono", usuarios[i].telefono);
+
+    if(nombre && correo && telefono){
+        usuarios[i] = {nombre, correo, telefono};
+        localStorage.setItem("usuarios", JSON.stringify(usuarios));
+        verUsuarios();
+    }
+}
+</script>
+
+</body>
+</html>
